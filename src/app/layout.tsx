@@ -1,4 +1,10 @@
 import '../styles/globals.css';
+import { Inter } from 'next/font/google'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -8,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.className}>
       <body>
         <h1>From root layout!</h1>
         {children}
