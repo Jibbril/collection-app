@@ -2,14 +2,18 @@
   "name": "collection-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "sandbox": "node --loader ts-node/esm sandbox/sandbox.ts"
   },
   "dependencies": {
+    "@planetscale/database": "^1.7.0",
     "@t3-oss/env-nextjs": "^0.2.1",
+    "dotenv": "^16.0.3",
     "next": "^13.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -30,6 +34,7 @@
     "prettier": "^2.8.6",
     "prettier-plugin-tailwindcss": "^0.2.6",
     "tailwindcss": "^3.3.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   },
   "ct3aMetadata": {
