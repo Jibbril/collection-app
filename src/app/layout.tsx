@@ -1,10 +1,11 @@
-import '../styles/globals.css';
-import { Inter } from 'next/font/google'
+import "../styles/globals.css";
+import { Inter } from "next/font/google";
+import Navbar from "@/components/navigation/Navbar";
 
 const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-})
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -16,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <body>
-        <h1>From root layout!</h1>
+        <Navbar />
         {children}
       </body>
     </html>
@@ -24,6 +25,6 @@ export default function RootLayout({
 }
 
 export const metadata = {
-  title: 'Collection app',
-  description: 'Collect anything, remember everything.',
+  title: "Collection app",
+  description: "Collect anything, remember everything.",
 };
