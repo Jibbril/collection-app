@@ -1,15 +1,9 @@
 import { dbQuery } from '@/lib/db';
 import { currentUser } from '@clerk/nextjs';
-import { type ExecutedQuery } from '@planetscale/database';
 import { redirect } from 'next/navigation';
-
-interface Collection {
-  id: string;
-  name: string;
-  description?: string;
-  slug: string;
-  userId?: string;
-}
+import { type Collection } from '@/types/collections';
+import { type ExecutedQuery } from '@planetscale/database';
+import CollectionCard from '@/components/collections/CollectionCard';
 
 export default async function CollectionsPage() {
   const user = await currentUser();
@@ -26,10 +20,7 @@ export default async function CollectionsPage() {
   return (
     <>
       {collections.map((collection) => (
-        <div key={collection.id}>
-          <h2>{collection.name}</h2>
-          <p>{collection.description}</p>
-        </div>
+        <CollectionCard key={collection.id} collection={collection} />
       ))}
     </>
   );
