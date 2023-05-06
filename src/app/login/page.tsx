@@ -1,11 +1,10 @@
+import { SignIn } from '@clerk/nextjs';
 import React from 'react';
 
-interface Props {}
-
-export default function LoginPage({}: Props) {
+export default function LoginPage() {
   return (
-    <div>
-      <h1>Login Page</h1>
+    <div className='mt-5 flex justify-center'>
+      <SignIn routing='path' path='/login' redirectUrl={'/collections'} />
     </div>
   );
 }

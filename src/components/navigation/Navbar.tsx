@@ -8,12 +8,13 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/shadcn-ui/navigation-menu';
+import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
 const Navbar = () => {
   return (
     <nav className='flex gap-6 py-1 shadow-md md:gap-10'>
-      <NavigationMenu>
+      <NavigationMenu className='flex-start  flex'>
         <NavigationMenuList>
           <NavigationMenuItem>
             <Link href='/' legacyBehavior passHref>
@@ -32,12 +33,15 @@ const Navbar = () => {
           <NavigationMenuItem>
             <Link href='/login' legacyBehavior passHref>
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                login
+                Login
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
+      <div className='mr-2 flex items-center'>
+        <UserButton afterSignOutUrl='/' />
+      </div>
     </nav>
   );
 };
