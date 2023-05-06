@@ -18,7 +18,9 @@ export default function RootLayout({
       <html lang='en' className={inter.className}>
         <body>
           <Navbar />
-          {children}
+          <div className='flex-column container flex min-h-screen max-w-screen-lg'>
+            {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>
