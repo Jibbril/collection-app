@@ -1,5 +1,6 @@
 import { Client, type Transaction } from '@planetscale/database';
 
+// Planetscale DB
 const client = new Client({
   host: process.env.DATABASE_HOST,
   username: process.env.DATABASE_USERNAME,
@@ -14,3 +15,6 @@ export const transaction = async (
 ) => {
   return client.transaction(fn);
 };
+
+// swr
+export const fetcher = (str: string) => fetch(str).then((res) => res.json());
