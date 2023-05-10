@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/shadcn-ui/button';
-import { PlusCircle } from 'lucide-react';
+import { Loader2, PlusCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,13 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../shadcn-ui/dialog';
-import { Label } from '../shadcn-ui/label';
-import { Input } from '../shadcn-ui/input';
+} from '@/components/shadcn-ui/dialog';
+import { Label } from '@/components/shadcn-ui/label';
+import { Input } from '@/components/shadcn-ui/input';
 import { useState } from 'react';
-import { Textarea } from '../shadcn-ui/textarea';
+import { Textarea } from '@/components/shadcn-ui/textarea';
 import { addCollection } from '@/server/actions';
 import { useAuth } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { type MouseEvent } from 'react';
 
 interface Props {
   type: 'collection' | 'item';
@@ -25,33 +27,53 @@ interface Props {
 export default function CreateButton({ type }: Props) {
   const { userId } = useAuth();
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('hej');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   if (!userId) return null;
 
   const entity = type === 'collection' ? 'Collection' : 'Item';
-  const handleAdd = () => {
-    if (!name || name === '') {
-    } else {
-      addCollection({ name, description, userId })
-        .then(() => {
-          console.log('success');
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+  const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    addCollection({ name, description, userId })
+      .then(() => {
+        router.refresh();
+        closeDialog();
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  };
+
+  const closeDialog = () => {
+    setOpen(false);
+    setName('');
+    setDescription('');
   };
 
   return (
     <div className='ml-2 pt-1'>
-      <Dialog>
+      <Dialog open={open}>
         <DialogTrigger asChild>
-          <Button className='h-8 w-8 rounded-full px-1' variant='ghost'>
+          <Button
+            onClick={() => setOpen(true)}
+            className='h-8 w-8 rounded-full px-1'
+            variant='ghost'>
             <PlusCircle className='h-6 w-6' />
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent
+          onCloseClick={() => closeDialog()}
+          onInteractOutside={(e) => {
+            if (loading) e.preventDefault();
+            else closeDialog();
+          }}
+          onEscapeKeyDown={(e) => {
+            if (loading) e.preventDefault();
+            else closeDialog();
+          }}>
           <DialogHeader>
             <DialogTitle>New {entity}</DialogTitle>
             <DialogDescription>Create new {entity}</DialogDescription>
@@ -78,8 +100,19 @@ export default function CreateButton({ type }: Props) {
                 />
               </div>
               <DialogFooter>
-                <Button onClick={handleAdd} className='mt-4' type='submit'>
-                  Create
+                <Button
+                  disabled={Boolean(!name || name === '' || loading)}
+                  onClick={handleAdd}
+                  className='mt-4'
+                  type='submit'>
+                  {loading ? (
+                    <div className='flex items-center justify-center'>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Loading...
+                    </div>
+                  ) : (
+                    <span>Create</span>
+                  )}
                 </Button>
               </DialogFooter>
             </form>
