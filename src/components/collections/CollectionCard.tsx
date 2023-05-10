@@ -1,5 +1,5 @@
 import { type Collection } from '@/types/collections';
-import { MouseEvent } from 'react';
+import { type MouseEvent } from 'react';
 import {
   Card,
   CardContent,
