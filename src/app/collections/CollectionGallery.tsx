@@ -10,7 +10,7 @@ export default function CollectionGallery({ collections }: Props) {
     return <div>No collections found.</div>;
 
   return (
-    <div className='flex justify-center'>
+    <div className='flex flex-wrap justify-center'>
       {collections.map((collection) => (
         <CollectionCard key={collection.id} collection={collection} />
       ))}

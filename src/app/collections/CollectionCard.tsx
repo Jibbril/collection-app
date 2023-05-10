@@ -18,7 +18,7 @@ interface Props {
 export default function CollectionCard({ collection }: Props) {
   return (
     <Link
-      className='relative m-2 flex max-h-56'
+      className='relative m-2 flex max-h-56 w-72'
       href={`/collections/${collection.slug}`}>
       <Card className='flex flex-grow flex-col'>
         <CardHeader>

@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/shadcn-ui/dropdown-menu';
 import { deleteCollection } from '@/server/actions';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   type: 'collection' | 'item';
@@ -20,17 +21,12 @@ interface Props {
 }
 
 export default function EditButton({ type, collection }: Props) {
+  const router = useRouter();
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
     deleteCollection(collection.id)
-      .then(() => {
-        console.log('deleted');
-        // TODO: refresh collections after delete
-        // revalidatePath('/collections')
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      .then(() => router.refresh())
+      .catch((err) => console.error(err));
   };
 
   return (
