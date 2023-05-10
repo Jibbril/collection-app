@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/shadcn-ui/card';
-import { Badge } from '../shadcn-ui/badge';
+import { Badge } from '@/components/shadcn-ui/badge';
 import Link from 'next/link';
 import CardEditButton from '@/components/collections/EditButton';
 

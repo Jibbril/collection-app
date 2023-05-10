@@ -1,4 +1,4 @@
-import CollectionCard from '@/components/collections/CollectionCard';
+import CollectionCard from './CollectionCard';
 import { type Collection } from '@/types/collections';
 
 interface Props {
