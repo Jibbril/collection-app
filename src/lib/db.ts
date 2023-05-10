@@ -7,8 +7,11 @@ const client = new Client({
   password: process.env.DATABASE_PASSWORD,
 });
 
-export const dbQuery = async (query: string) => {
-  return client.connection().execute(query);
+export const dbQuery = async (
+  query: string,
+  opts?: object | unknown[] | null
+) => {
+  return client.connection().execute(query, opts);
 };
 export const transaction = async (
   fn: (tx: Transaction) => Promise<unknown>
