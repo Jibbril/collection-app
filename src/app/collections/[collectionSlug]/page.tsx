@@ -1,6 +1,6 @@
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { collectionsAndItems } from '@/server/queries';
+import { prisma } from '@/lib/prisma';
 
 interface Props {
   params: {
@@ -13,16 +13,24 @@ export default async function ItemsPage({ params }: Props) {
 
   if (!user) return redirect('/login');
 
-  const res = await collectionsAndItems(
-    `WHERE c.userId = '${user.id}' AND c.slug = '${params.collectionSlug}'`
-  );
+  const collection = await prisma.collection.findFirst({
+    where: {
+      userId: user.id,
+      slug: params.collectionSlug,
+    },
+    include: {
+      items: true,
+    },
+  });
+
+  if (!collection) return redirect('/collections');
 
   return (
     <div className='flex w-full flex-col items-center'>
       <div className='mb-2 mt-4 flex items-center'>
-        <h1 className='font-heading text-4xl lg:text-5xl'>{res[0].name}</h1>
+        <h1 className='font-heading text-4xl lg:text-5xl'>{collection.name}</h1>
       </div>
-      {res[0]?.items.map((item) => (
+      {collection.items.map((item) => (
         <div key={item.id}>{item.name}</div>
       ))}
     </div>

@@ -1,16 +1,20 @@
 'use server';
 
-import { type Collection } from '@/types/collections';
-import { dbQuery } from './db';
+import { type Collection } from '@prisma/client';
+import { prisma } from './prisma';
 
 export const generateSlug = async (name: string, userId: string) => {
   let slug = slugify(name);
-  const { rows: sameSlugCollections } = await dbQuery(
-    `SELECT * FROM Collection WHERE slug = '${slug}' AND userId = '${userId}'`
-  );
+
+  const sameSlugCollections = await prisma.collection.findMany({
+    where: {
+      slug: { startsWith: slug },
+      userId,
+    },
+  });
 
   if (sameSlugCollections.length > 0) {
-    slug = addSlugSuffix(sameSlugCollections as Collection[], slug);
+    slug = addSlugSuffix(sameSlugCollections, slug);
   }
 
   return slug;

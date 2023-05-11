@@ -1,6 +1,5 @@
 'use client';
 
-import { type Collection } from '@/types/collections';
 import { type MouseEvent } from 'react';
 import { Edit, MoreVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/shadcn-ui/button';
@@ -14,6 +13,7 @@ import {
 } from '@/components/shadcn-ui/dropdown-menu';
 import { deleteCollection } from '@/server/actions';
 import { useRouter } from 'next/navigation';
+import { type Collection } from '@prisma/client';
 
 interface Props {
   type: 'collection' | 'item';

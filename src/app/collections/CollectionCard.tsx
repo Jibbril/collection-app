@@ -1,4 +1,3 @@
-import { type Collection } from '@/types/collections';
 import {
   Card,
   CardContent,
@@ -10,6 +9,7 @@ import {
 import { Badge } from '@/components/shadcn-ui/badge';
 import Link from 'next/link';
 import CardEditButton from '@/components/collections/EditButton';
+import { type Collection } from '@prisma/client';
 
 interface Props {
   collection: Collection;

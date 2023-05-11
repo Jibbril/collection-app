@@ -1,18 +1,19 @@
 import CollectionGallery from './CollectionGallery';
 import CreateButton from '@/components/collections/CreateButton';
-import { type Collection } from '@/types/collections';
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { dbQuery } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export default async function CollectionsPage() {
   const user = await currentUser();
 
   if (!user) return redirect('/login');
 
-  const { rows } = await dbQuery(
-    `SELECT * FROM Collection where userId = '${user.id}'`
-  );
+  const collections = await prisma.collection.findMany({
+    where: {
+      userId: user.id,
+    },
+  });
 
   return (
     <div className='flex w-full flex-col items-center'>
@@ -21,7 +22,7 @@ export default async function CollectionsPage() {
         <CreateButton type='collection' />
       </div>
 
-      <CollectionGallery collections={rows as Collection[]} />
+      <CollectionGallery collections={collections} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
+import { type Collection } from '@prisma/client';
 import CollectionCard from './CollectionCard';
-import { type Collection } from '@/types/collections';
 
 interface Props {
   collections: Collection[];
