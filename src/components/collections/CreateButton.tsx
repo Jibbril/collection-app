@@ -45,10 +45,10 @@ export default function CreateButton({ type, collectionId }: Props) {
     setLoading(true);
     new Promise((resolve) => {
       if (type === 'collection') {
-        resolve(addCollection({ name, description, userId }));
+        resolve(addCollection({ name, description, userId, tags }));
       } else {
         if (!collectionId) throw new Error('No collection ID provided');
-        resolve(addItem({ name, description, collectionId, userId }));
+        resolve(addItem({ name, description, collectionId, userId, tags }));
       }
     })
       .then(() => {

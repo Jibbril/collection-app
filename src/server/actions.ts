@@ -2,11 +2,13 @@
 
 import { generateSlug } from '@/lib/slug-handling';
 import { prisma } from '@/lib/prisma';
+import { type Tag } from '@prisma/client';
 
 export const addCollection = async (config: {
   name: string;
   description: string;
   userId: string;
+  tags: Tag[];
 }) => {
   const collection = {
     name: config.name,
@@ -16,7 +18,15 @@ export const addCollection = async (config: {
   };
 
   await prisma.collection.create({
-    data: collection,
+    data: {
+      ...collection,
+      tags: {
+        create: config.tags.map((tag) => ({
+          name: tag.name,
+          userId: config.userId,
+        })),
+      },
+    },
   });
 };
 
@@ -25,6 +35,7 @@ export const addItem = async (config: {
   description: string;
   userId: string;
   collectionId: string;
+  tags: Tag[];
 }) => {
   const item = {
     name: config.name,
@@ -34,7 +45,15 @@ export const addItem = async (config: {
   };
 
   await prisma.item.create({
-    data: item,
+    data: {
+      ...item,
+      tags: {
+        create: config.tags.map((tag) => ({
+          name: tag.name,
+          userId: config.userId,
+        })),
+      },
+    },
   });
 };
 
