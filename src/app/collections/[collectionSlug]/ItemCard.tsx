@@ -9,6 +9,7 @@ import Link from 'next/link';
 import CardEditButton from '@/components/collections/EditButton';
 import TagGrid from '@/components/collections/TagGrid';
 import { type ItemWithTags } from '@/types/collections';
+import { shortenIfNeeded } from '@/lib/utils';
 
 interface Props {
   collectionSlug: string;
@@ -29,7 +30,7 @@ export default function ItemCard({ item, collectionSlug }: Props) {
           </div>
         </CardHeader>
         <CardContent className='flex flex-grow flex-col'>
-          <CardDescription>{item.description}</CardDescription>
+          <CardDescription>{shortenIfNeeded(item.description)}</CardDescription>
           <div className='mt-2'>
             <TagGrid tags={item.tags} />
           </div>

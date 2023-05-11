@@ -94,7 +94,7 @@ export default function CreateButton({ type, collectionId }: Props) {
           <div>
             <form>
               <div>
-                <Label htmlFor='name'>Collection Name</Label>
+                <Label htmlFor='name'>{entity} Name</Label>
                 <Input
                   type='text'
                   id='name'
