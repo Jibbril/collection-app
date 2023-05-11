@@ -21,7 +21,11 @@ export default async function ItemsPage({ params }: Props) {
       slug: params.collectionSlug,
     },
     include: {
-      items: true,
+      items: {
+        include: {
+          tags: true,
+        },
+      },
     },
   });
 

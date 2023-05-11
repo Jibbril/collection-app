@@ -1,26 +1,15 @@
-export interface Collection {
-  id: string;
-  name: string;
-  description?: string;
-  slug: string;
-  userId?: string;
-}
+import { type Prisma } from '@prisma/client';
 
-export interface CollectionWithItems extends Collection {
-  items: Item[];
-}
-
-export interface Item {
-  id: string;
-  slug: string;
-  name: string;
-  description?: string;
-  collectionId: string;
-  tags: Tag[];
-}
-
-export interface Tag {
-  id: string;
-  name: string;
-  userId: string;
-}
+export type CollectionWithItems = Prisma.CollectionGetPayload<{
+  include: { items: true };
+}>;
+export type CollectionWithTags = Prisma.CollectionGetPayload<{
+  include: { tags: true };
+}>;
+export type CollectionWithItemsAndTags = Prisma.CollectionGetPayload<{
+  include: {
+    tags: true;
+    items: { include: { tags: true } };
+  };
+}>;
+export type ItemWithTags = Prisma.ItemGetPayload<{ include: { tags: true } }>;

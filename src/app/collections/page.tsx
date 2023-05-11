@@ -13,6 +13,9 @@ export default async function CollectionsPage() {
     where: {
       userId: user.id,
     },
+    include: {
+      tags: true,
+    },
   });
 
   return (

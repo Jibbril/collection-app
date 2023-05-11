@@ -2,18 +2,17 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/shadcn-ui/card';
-import { Badge } from '@/components/shadcn-ui/badge';
 import Link from 'next/link';
 import CardEditButton from '@/components/collections/EditButton';
-import { type Item } from '@prisma/client';
+import TagGrid from '@/components/collections/TagGrid';
+import { type ItemWithTags } from '@/types/collections';
 
 interface Props {
   collectionSlug: string;
-  item: Item;
+  item: ItemWithTags;
 }
 
 export default function ItemCard({ item, collectionSlug }: Props) {
@@ -29,17 +28,12 @@ export default function ItemCard({ item, collectionSlug }: Props) {
             <CardEditButton entity={item} type='item' />
           </div>
         </CardHeader>
-        <CardContent className='flex flex-grow'>
+        <CardContent className='flex flex-grow flex-col'>
           <CardDescription>{item.description}</CardDescription>
+          <div className='mt-2'>
+            <TagGrid tags={item.tags} />
+          </div>
         </CardContent>
-        <CardFooter>
-          <Badge variant='secondary' className='mr-2'>
-            Tag 1
-          </Badge>
-          <Badge variant='secondary' className='mr-2'>
-            Tag 2
-          </Badge>
-        </CardFooter>
       </Card>
     </Link>
   );

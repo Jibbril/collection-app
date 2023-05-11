@@ -22,6 +22,9 @@ export default async function ItemsPage({ params }: Props) {
       },
       slug: params.itemSlug,
     },
+    include: {
+      tags: true,
+    },
   });
 
   if (!item) return redirect(`/collections/${params.collectionSlug}`);
