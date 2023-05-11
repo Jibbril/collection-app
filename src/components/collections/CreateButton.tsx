@@ -15,16 +15,17 @@ import { Label } from '@/components/shadcn-ui/label';
 import { Input } from '@/components/shadcn-ui/input';
 import { useState } from 'react';
 import { Textarea } from '@/components/shadcn-ui/textarea';
-import { addCollection } from '@/server/actions';
+import { addCollection, addItem } from '@/server/actions';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { type MouseEvent } from 'react';
 
 interface Props {
   type: 'collection' | 'item';
+  collectionId?: string;
 }
 
-export default function CreateButton({ type }: Props) {
+export default function CreateButton({ type, collectionId }: Props) {
   const { userId } = useAuth();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -38,7 +39,14 @@ export default function CreateButton({ type }: Props) {
   const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
-    addCollection({ name, description, userId })
+    new Promise((resolve) => {
+      if (type === 'collection') {
+        resolve(addCollection({ name, description, userId }));
+      } else {
+        if (!collectionId) throw new Error('No collection ID provided');
+        resolve(addItem({ name, description, collectionId, userId }));
+      }
+    })
       .then(() => {
         router.refresh();
         closeDialog();

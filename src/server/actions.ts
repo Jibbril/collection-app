@@ -20,6 +20,24 @@ export const addCollection = async (config: {
   });
 };
 
+export const addItem = async (config: {
+  name: string;
+  description: string;
+  userId: string;
+  collectionId: string;
+}) => {
+  const item = {
+    name: config.name,
+    description: config.description || '',
+    slug: await generateSlug(config.name, config.userId),
+    collectionId: config.collectionId,
+  };
+
+  await prisma.item.create({
+    data: item,
+  });
+};
+
 export const deleteCollection = async (id: string) => {
   await prisma.collection.delete({ where: { id } });
 };
