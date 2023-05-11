@@ -25,7 +25,7 @@ export default function CollectionCard({ collection }: Props) {
         <CardHeader>
           <div className='flex items-center justify-between'>
             <CardTitle className='py-1'>{collection.name}</CardTitle>
-            <CardEditButton collection={collection} type='collection' />
+            <CardEditButton entity={collection} type='collection' />
           </div>
         </CardHeader>
         <CardContent className='flex flex-grow'>

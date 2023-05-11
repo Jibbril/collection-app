@@ -23,3 +23,7 @@ export const addCollection = async (config: {
 export const deleteCollection = async (id: string) => {
   await prisma.collection.delete({ where: { id } });
 };
+
+export const deleteItem = async (id: string) => {
+  await prisma.item.delete({ where: { id } });
+};

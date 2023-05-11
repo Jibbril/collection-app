@@ -11,20 +11,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/shadcn-ui/dropdown-menu';
-import { deleteCollection } from '@/server/actions';
+import { deleteCollection, deleteItem } from '@/server/actions';
 import { useRouter } from 'next/navigation';
-import { type Collection } from '@prisma/client';
+import { type Item, type Collection } from '@prisma/client';
 
 interface Props {
   type: 'collection' | 'item';
-  collection: Collection;
+  entity: Collection | Item;
 }
 
-export default function EditButton({ type, collection }: Props) {
+export default function EditButton({ type, entity }: Props) {
   const router = useRouter();
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
-    deleteCollection(collection.id)
+    const fn = type === 'collection' ? deleteCollection : deleteItem;
+    fn(entity.id)
       .then(() => router.refresh())
       .catch((err) => console.error(err));
   };
@@ -37,7 +38,7 @@ export default function EditButton({ type, collection }: Props) {
             variant='ghost'
             className='absolute right-2 top-2 h-6 w-6 rounded-full p-0 '>
             <MoreVertical className='h-4 w-4' />
-            <span className='sr-only'>Edit collection {collection.name}</span>
+            <span className='sr-only'>Edit {type}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
