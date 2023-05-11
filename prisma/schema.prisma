@@ -1,0 +1,61 @@
+// MySQL connection to PlanetScale
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Collection {
+  id          String  @id @default(uuid())
+  slug        String  
+  name        String
+  description String?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  items Item[]
+  tags  Tag[]
+
+  @@index([userId])
+}
+
+model Item {
+  id          String  @id @default(uuid())
+  slug        String  
+  name        String
+  description String?
+
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  tags Tag[]
+
+  @@index([collectionId])
+}
+
+model Tag {
+  id   String @id @default(uuid())
+  name String
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  collections Collection[]
+  items       Item[]
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(uuid())
+
+  collections Collection[]
+  tags        Tag[]
+}
+
