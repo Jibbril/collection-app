@@ -1,11 +1,11 @@
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import ItemGallery from './ItemGallery';
 
 interface Props {
   params: {
     collectionSlug: string;
+    itemSlug: string;
   };
 }
 
@@ -14,24 +14,26 @@ export default async function ItemsPage({ params }: Props) {
 
   if (!user) return redirect('/login');
 
-  const collection = await prisma.collection.findFirst({
+  const item = await prisma.item.findFirst({
     where: {
-      userId: user.id,
-      slug: params.collectionSlug,
-    },
-    include: {
-      items: true,
+      collection: {
+        userId: user.id,
+        slug: params.collectionSlug,
+      },
+      slug: params.itemSlug,
     },
   });
 
-  if (!collection) return redirect('/collections');
+  if (!item) return redirect(`/collections/${params.collectionSlug}`);
 
   return (
     <div className='flex w-full flex-col items-center'>
       <div className='mb-2 mt-4 flex items-center'>
-        <h1 className='font-heading text-4xl lg:text-5xl'>{collection.name}</h1>
+        <h1 className='font-heading text-4xl lg:text-5xl'>{item.name}</h1>
       </div>
-      <ItemGallery collectionSlug={collection.slug} items={collection.items} />
+      <h4 className='font-heading ml-2 text-2xl lg:text-3xl'>
+        {item.description}
+      </h4>
     </div>
   );
 }
