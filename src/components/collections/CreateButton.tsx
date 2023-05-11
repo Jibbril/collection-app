@@ -19,6 +19,9 @@ import { addCollection, addItem } from '@/server/actions';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { type MouseEvent } from 'react';
+import TagInput from './TagInput';
+import TagGrid from './TagGrid';
+import { Tag } from '@prisma/client';
 
 interface Props {
   type: 'collection' | 'item';
@@ -31,6 +34,7 @@ export default function CreateButton({ type, collectionId }: Props) {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [tags, setTags] = useState<Tag[]>([]);
   const router = useRouter();
 
   if (!userId) return null;
@@ -59,6 +63,7 @@ export default function CreateButton({ type, collectionId }: Props) {
     setOpen(false);
     setName('');
     setDescription('');
+    setTags([]);
   };
 
   return (
@@ -105,6 +110,16 @@ export default function CreateButton({ type, collectionId }: Props) {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder='Enter description...'
+                />
+              </div>
+              <div className='mt-2'>
+                <Label htmlFor='tags'>Tags</Label>
+                <TagInput tags={tags} setTags={setTags} />
+                <TagGrid
+                  editable={true}
+                  className='mt-4'
+                  tags={tags}
+                  setTags={setTags}
                 />
               </div>
               <DialogFooter>
