@@ -11,7 +11,7 @@ export default async function CollectionsPage() {
   if (!user) return redirect('/login');
 
   const { rows } = await dbQuery(
-    `SELECT * FROM Collection where userId = '${user?.id}'`
+    `SELECT * FROM Collection where userId = '${user.id}'`
   );
 
   return (
