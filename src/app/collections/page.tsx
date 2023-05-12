@@ -14,7 +14,11 @@ export default async function CollectionsPage() {
       userId: user.id,
     },
     include: {
-      tags: true,
+      tags: {
+        orderBy: {
+          name: 'asc',
+        },
+      },
     },
   });
 

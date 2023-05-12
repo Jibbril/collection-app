@@ -73,5 +73,8 @@ export const searchTags = async (query: string, userId: string) => {
         contains: query,
       },
     },
+    orderBy: {
+      name: 'asc',
+    },
   });
 };

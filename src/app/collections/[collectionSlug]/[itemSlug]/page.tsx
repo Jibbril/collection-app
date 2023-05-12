@@ -23,7 +23,7 @@ export default async function ItemsPage({ params }: Props) {
       slug: params.itemSlug,
     },
     include: {
-      tags: true,
+      tags: { orderBy: { name: 'asc' } },
     },
   });
 

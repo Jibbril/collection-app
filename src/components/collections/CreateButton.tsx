@@ -126,7 +126,7 @@ export default function CreateButton({ type, collectionId }: Props) {
                 <Button
                   disabled={Boolean(!name || name === '' || loading)}
                   onClick={handleAdd}
-                  className='mt-4'
+                  className='mr-1 mt-4'
                   type='submit'>
                   {loading ? (
                     <div className='flex items-center justify-center'>

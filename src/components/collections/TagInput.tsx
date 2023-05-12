@@ -36,10 +36,29 @@ export default function TagInput({ tags, setTags, userId }: Props) {
         })
         .catch((err) => console.error(err))
         .finally(() => setLoading(false));
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(getQueryTags);
   }, [query, userId]);
+
+  const handleTagSelect = (currentValue: string) => {
+    currentValue = currentValue.toLowerCase().trim();
+    const tagAlreadySelected = tags.find(
+      (t) => t.name.toLowerCase() === currentValue
+    );
+
+    if (tagAlreadySelected) return;
+
+    setTags([
+      ...tags,
+      {
+        name: currentValue,
+        id: uuidv4(),
+        userId: null,
+      },
+    ]);
+    setOpen(false);
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -55,7 +74,7 @@ export default function TagInput({ tags, setTags, userId }: Props) {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn([`w-[${ref.current?.clientWidth || 300}px]`, 'p-0'])}>
+        className={`w-[${ref.current?.clientWidth || 300}px] p-0`}>
         <Command
           filter={(value, search) => {
             if (value.includes(search)) return 1;
@@ -67,10 +86,15 @@ export default function TagInput({ tags, setTags, userId }: Props) {
               setLoading(true);
               setQuery(val);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && query?.length > 0) {
+                handleTagSelect(query);
+              }
+            }}
             placeholder='Add Tags...'
           />
           {!loading && <CommandEmpty>Add New Tag</CommandEmpty>}
-          <CommandList>
+          <CommandList className='max-h-36'>
             {loading && (
               <CommandLoading>
                 <div className='m-1.5 flex w-full justify-center'>
@@ -83,21 +107,14 @@ export default function TagInput({ tags, setTags, userId }: Props) {
                 <CommandItem
                   key={queryTag.id}
                   value={queryTag.name}
-                  onSelect={(currentValue) => {
-                    setTags([
-                      ...tags,
-                      {
-                        name: currentValue,
-                        id: uuidv4(),
-                        userId: null,
-                      },
-                    ]);
-                    setOpen(false);
-                  }}>
+                  onSelect={handleTagSelect}>
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      tags.find((t) => t.name === queryTag.name)
+                      tags.find(
+                        (t) =>
+                          t.name.toLowerCase() === queryTag.name.toLowerCase()
+                      )
                         ? 'opacity-100'
                         : 'opacity-0'
                     )}
