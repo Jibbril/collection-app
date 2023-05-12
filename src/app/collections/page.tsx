@@ -1,36 +1,35 @@
-import { dbQuery } from '@/lib/db';
+import CollectionGallery from './CollectionGallery';
+import CreateButton from '@/components/collections/CreateButton';
 import { currentUser } from '@clerk/nextjs';
-import { type ExecutedQuery } from '@planetscale/database';
 import { redirect } from 'next/navigation';
-
-interface Collection {
-  id: string;
-  name: string;
-  description?: string;
-  slug: string;
-  userId?: string;
-}
+import { prisma } from '@/lib/prisma';
 
 export default async function CollectionsPage() {
   const user = await currentUser();
+
   if (!user) return redirect('/login');
 
-  const data: ExecutedQuery = await dbQuery(
-    `SELECT * FROM Collection where userId = '${user.id}'`
-  );
-  const collections = data?.rows as Collection[];
-
-  if (!collections || collections.length === 0)
-    return <div>No collections found for user with id {user.id}</div>;
+  const collections = await prisma.collection.findMany({
+    where: {
+      userId: user.id,
+    },
+    include: {
+      tags: {
+        orderBy: {
+          name: 'asc',
+        },
+      },
+    },
+  });
 
   return (
-    <>
-      {collections.map((collection) => (
-        <div key={collection.id}>
-          <h2>{collection.name}</h2>
-          <p>{collection.description}</p>
-        </div>
-      ))}
-    </>
+    <div className='flex w-full flex-col items-center'>
+      <div className='mb-2 mt-4 flex items-center'>
+        <h1 className='font-heading text-4xl lg:text-5xl'>Collections</h1>
+        <CreateButton type='collection' />
+      </div>
+
+      <CollectionGallery collections={collections} />
+    </div>
   );
 }
