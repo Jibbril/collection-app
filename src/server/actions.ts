@@ -64,3 +64,14 @@ export const deleteCollection = async (id: string) => {
 export const deleteItem = async (id: string) => {
   await prisma.item.delete({ where: { id } });
 };
+
+export const searchTags = async (query: string, userId: string) => {
+  return await prisma.tag.findMany({
+    where: {
+      userId,
+      name: {
+        contains: query,
+      },
+    },
+  });
+};

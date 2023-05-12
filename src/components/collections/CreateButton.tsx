@@ -18,10 +18,10 @@ import { Textarea } from '@/components/shadcn-ui/textarea';
 import { addCollection, addItem } from '@/server/actions';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { type MouseEvent } from 'react';
 import TagInput from './TagInput';
 import TagGrid from './TagGrid';
-import { Tag } from '@prisma/client';
+import { type MouseEvent } from 'react';
+import { type Tag } from '@prisma/client';
 
 interface Props {
   type: 'collection' | 'item';
@@ -114,7 +114,7 @@ export default function CreateButton({ type, collectionId }: Props) {
               </div>
               <div className='mt-2'>
                 <Label htmlFor='tags'>Tags</Label>
-                <TagInput tags={tags} setTags={setTags} />
+                <TagInput userId={userId} tags={tags} setTags={setTags} />
                 <TagGrid
                   editable={true}
                   className='mt-4'
