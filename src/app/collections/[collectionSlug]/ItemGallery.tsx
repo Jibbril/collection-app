@@ -1,13 +1,14 @@
-import { type Item } from '@prisma/client';
 import ItemCard from './ItemCard';
+import GalleryNotFound from '@/components/collections/GalleryNotFound';
+import { type ItemWithTags } from '@/types/collections';
 
 interface Props {
   collectionSlug: string;
-  items: Item[];
+  items: ItemWithTags[];
 }
 
 export default function ItemGallery({ items, collectionSlug }: Props) {
-  if (!items || items.length === 0) return <div>No items found.</div>;
+  if (!items || items.length === 0) return <GalleryNotFound entity='item' entityName='Items' />;
 
   return (
     <div className='flex flex-wrap justify-center'>
