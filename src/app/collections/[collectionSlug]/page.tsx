@@ -3,6 +3,12 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ItemGallery from './ItemGallery';
 import CreateButton from '@/components/collections/CreateButton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/shadcn-ui/tooltip';
 
 interface Props {
   params: {
@@ -36,12 +42,30 @@ export default async function ItemsPage({ params }: Props) {
   if (!collection) return redirect('/collections');
 
   return (
-    <div className='flex w-full flex-col items-center'>
-      <div className='mb-2 mt-4 flex items-center'>
-        <h1 className='font-heading text-4xl lg:text-5xl'>{collection.name}</h1>
-        <CreateButton collectionId={collection.id} type='item' />
+    <div className='mt-1 flex w-full'>
+      <div className='flex w-full flex-col items-center'>
+        <div className='mb-2 mt-4 flex items-center'>
+          <h4 className='font-heading text-3xl font-bold lg:text-4xl'>
+            {collection.name}
+          </h4>
+        </div>
+        <ItemGallery
+          collectionSlug={collection.slug}
+          items={collection.items}
+        />
       </div>
-      <ItemGallery collectionSlug={collection.slug} items={collection.items} />
+      <div className='mt-3'>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <CreateButton collectionId={collection.id} type='item' />
+            </TooltipTrigger>
+            <TooltipContent sideOffset='-0.5' side='bottom'>
+              <p>Create new Item</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     </div>
   );
 }
