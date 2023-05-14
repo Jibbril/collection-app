@@ -1,7 +1,8 @@
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
-import Navbar from '@/components/navigation/Navbar';
 import { ClerkProvider } from '@clerk/nextjs';
+import Navbar from '@/components/navigation/Navbar';
+import Footer from '@/components/navigation/footer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -18,9 +19,8 @@ export default function RootLayout({
       <html lang='en' className={inter.className}>
         <body>
           <Navbar />
-          <div className='flex-column container flex min-h-screen max-w-screen-lg'>
-            {children}
-          </div>
+          <div>{children}</div>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>
