@@ -19,14 +19,22 @@ export default function Footer({}: Props) {
               rel='noreferrer'
               className='font-medium underline underline-offset-4'>
               Jibbril
-            </a>
-            . Hosted on{' '}
+            </a>{' '}
+            using{' '}
             <a
-              href='https://vercel.com'
+              href={'https://nextjs.org/'}
               target='_blank'
               rel='noreferrer'
               className='font-medium underline underline-offset-4'>
-              Vercel
+              Next.js
+            </a>{' '}
+            and{' '}
+            <a
+              href={'https://ui.shadcn.com/'}
+              target='_blank'
+              rel='noreferrer'
+              className='font-medium underline underline-offset-4'>
+              shadcn/ui
             </a>
             .
           </p>
