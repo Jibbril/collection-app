@@ -54,7 +54,7 @@ export default function TagInput({ tags, setTags, userId }: Props) {
       {
         name: currentValue,
         id: uuidv4(),
-        userId: null,
+        userId,
       },
     ]);
     setOpen(false);
