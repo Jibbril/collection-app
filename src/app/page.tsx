@@ -1,3 +1,4 @@
+import Footer from '@/components/navigation/footer';
 import { buttonVariants } from '@/components/shadcn-ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -154,6 +155,7 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
