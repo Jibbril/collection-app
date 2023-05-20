@@ -1,13 +1,14 @@
-import { type Collection } from '@prisma/client';
+import GalleryNotFound from '@/components/collections/GalleryNotFound';
 import CollectionCard from './CollectionCard';
+import { type CollectionWithTags } from '@/types/collections';
 
 interface Props {
-  collections: Collection[];
+  collections: CollectionWithTags[];
 }
 
 export default function CollectionGallery({ collections }: Props) {
   if (!collections || collections.length === 0)
-    return <div>No collections found.</div>;
+    return <GalleryNotFound entity='collection' entityName='Collections' />;
 
   return (
     <div className='flex flex-wrap justify-center'>

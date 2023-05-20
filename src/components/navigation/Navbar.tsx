@@ -1,6 +1,5 @@
 'use client';
 
-// import './Navbar.css';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -8,40 +7,46 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/shadcn-ui/navigation-menu';
-import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
+import { UserButton, useAuth } from '@clerk/nextjs';
 
 const Navbar = () => {
+  const { userId } = useAuth();
+  const signedIn = Boolean(userId);
   return (
-    <nav className='flex gap-6 py-1 shadow-md md:gap-10'>
-      <NavigationMenu className='flex-start  flex'>
+    <nav className='flex-start flex items-center p-0 px-4 py-1 shadow-md'>
+      <Link href='/'>
+        <h4 className='text-md font-bold'>Collec</h4>
+      </Link>
+      <NavigationMenu
+        className='flex-start flex
+      justify-end'>
         <NavigationMenuList>
-          <NavigationMenuItem>
-            <Link href='/' legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Home
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href='/collections' legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Collections
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href='/login' legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Login
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
+          {signedIn && (
+            <NavigationMenuItem>
+              <Link href='/collections' legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Collections
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+          )}
+          {!signedIn && (
+            <NavigationMenuItem>
+              <Link href='/login' legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Login
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+          )}
         </NavigationMenuList>
       </NavigationMenu>
-      <div className='mr-2 flex items-center'>
-        <UserButton afterSignOutUrl='/' />
-      </div>
+      {signedIn && (
+        <div className='mx-2 flex items-center'>
+          <UserButton afterSignOutUrl='/' />
+        </div>
+      )}
     </nav>
   );
 };
