@@ -3,7 +3,7 @@ import CollectionCard from './CollectionCard';
 import { type CollectionWithTags } from '@/types/collections';
 
 interface Props {
-  collections: CollectionWithTags[];
+  collections: CollectionWithTags[] | undefined;
 }
 
 export default function CollectionGallery({ collections }: Props) {
