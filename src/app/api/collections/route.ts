@@ -8,6 +8,9 @@ export async function GET() {
   if (!user) return new NextResponse(null, { status: 401 });
 
   const collections = await prisma.collection.findMany({
+    orderBy: {
+      name: 'asc',
+    },
     where: { userId: user.id },
     include: {
       tags: {

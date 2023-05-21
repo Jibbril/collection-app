@@ -1,3 +1,4 @@
+import { type CollectionWithTags } from '@/types/collections';
 import { atom } from 'jotai';
 
-export const jibbrilAtom = atom('Jibbril');
+export const collectionsAtom = atom<CollectionWithTags[]>([]);
