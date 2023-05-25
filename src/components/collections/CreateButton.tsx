@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from '@/components/shadcn-ui/button';
-import { Loader2, PlusCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -11,17 +9,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/shadcn-ui/dialog';
+import { Button } from '@/components/shadcn-ui/button';
 import { Label } from '@/components/shadcn-ui/label';
 import { Input } from '@/components/shadcn-ui/input';
-import { useState } from 'react';
 import { Textarea } from '@/components/shadcn-ui/textarea';
+import { Loader2, PlusCircle } from 'lucide-react';
 import { addCollection, addItem } from '@/server/actions';
+import { collectionsAtom } from '@/lib/atoms';
+import { useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useSetAtom } from 'jotai';
 import TagInput from './TagInput';
 import TagGrid from './TagGrid';
 import { type MouseEvent } from 'react';
 import { type Tag } from '@prisma/client';
+import {
+  type CollectionWithTags,
+  type ItemWithTags,
+} from '@/types/collections';
 
 interface Props {
   type: 'collection' | 'item';
@@ -35,7 +40,7 @@ export default function CreateButton({ type, collectionId }: Props) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
-  const router = useRouter();
+  const setCollections = useSetAtom(collectionsAtom);
 
   if (!userId) return null;
 
@@ -43,16 +48,25 @@ export default function CreateButton({ type, collectionId }: Props) {
   const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
-    new Promise((resolve) => {
-      if (type === 'collection') {
+
+    const isCollection = type === 'collection';
+    new Promise<CollectionWithTags | ItemWithTags>((resolve) => {
+      if (isCollection) {
         resolve(addCollection({ name, description, userId, tags }));
       } else {
         if (!collectionId) throw new Error('No collection ID provided');
         resolve(addItem({ name, description, collectionId, userId, tags }));
       }
     })
-      .then(() => {
-        router.refresh();
+      .then((newEntity) => {
+        if (newEntity && isCollection) {
+          const newCollection = newEntity as CollectionWithTags;
+          setCollections((collections) => [...collections, newCollection]);
+        } else {
+          // TODO: Fix item creation logic
+        }
+
+        // router.refresh();
         closeDialog();
       })
       .catch((err) => console.error(err))

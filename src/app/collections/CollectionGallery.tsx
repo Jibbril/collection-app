@@ -8,22 +8,27 @@ import { collectionsAtom } from '@/lib/atoms';
 import { useAtomValue } from 'jotai';
 
 export default function CollectionGallery() {
-  const [query, setQuery] = useState('');
   const collections = useAtomValue(collectionsAtom);
+  const [query, setQuery] = useState('');
   const [filteredCollections, setFilteredCollections] = useState(collections);
 
   useEffect(() => {
-    if (!query || query === '') {
-      setFilteredCollections(collections);
-    } else {
-      const filtered = collections?.filter((collection) => {
-        return (
-          collection.name.toLowerCase().includes(query) ||
-          collection.tags.some((tag) => tag.name.toLowerCase().includes(query))
-        );
-      });
-      setFilteredCollections(filtered);
-    }
+    const filterCollections = () => {
+      if (!query || query === '') {
+        return collections;
+      } else {
+        return collections?.filter((collection) => {
+          return (
+            collection.name.toLowerCase().includes(query) ||
+            collection.tags.some((tag) =>
+              tag.name.toLowerCase().includes(query)
+            )
+          );
+        });
+      }
+    };
+
+    setFilteredCollections(filterCollections());
   }, [query, collections]);
 
   return (
