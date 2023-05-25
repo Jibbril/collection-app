@@ -10,25 +10,43 @@ import CardEditButton from '@/components/collections/EditButton';
 import TagGrid from '@/components/collections/TagGrid';
 import { type CollectionWithTags } from '@/types/collections';
 import { shortenIfNeeded } from '@/lib/utils';
+import { useState } from 'react';
+import Loader from '@/components/navigation/Loader';
 
 interface Props {
   collection: CollectionWithTags;
 }
 
 export default function CollectionCard({ collection }: Props) {
+  const [loading, setLoading] = useState(false);
+
+  if (loading) {
+    return (
+      <Card className='relative m-2 flex h-52 w-72'>
+        <CardContent className='flex flex-grow flex-col'>
+          <Loader center={true} />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Link
       prefetch={false}
-      className='relative m-2 flex max-h-56 w-72'
+      className='relative m-2 flex h-52 w-72'
       href={`/collections/${collection.slug}`}>
       <Card className='flex flex-grow flex-col'>
         <CardHeader>
           <div className='flex items-center justify-between'>
             <CardTitle className='py-1'>{collection.name}</CardTitle>
-            <CardEditButton entity={collection} type='collection' />
+            <CardEditButton
+              entity={collection}
+              type='collection'
+              setLoading={setLoading}
+            />
           </div>
         </CardHeader>
-        <CardContent className='flex flex-grow flex-col'>
+        <CardContent className='flex h-full flex-grow flex-col justify-between'>
           <CardDescription>
             {shortenIfNeeded(collection.description)}
           </CardDescription>
