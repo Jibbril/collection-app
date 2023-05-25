@@ -15,7 +15,7 @@ import { Input } from '@/components/shadcn-ui/input';
 import { Textarea } from '@/components/shadcn-ui/textarea';
 import { Loader2, PlusCircle } from 'lucide-react';
 import { addCollection, addItem } from '@/server/actions';
-import { collectionsAtom } from '@/lib/atoms';
+import { collectionsAtom, itemsAtom } from '@/lib/atoms';
 import { useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useSetAtom } from 'jotai';
@@ -41,6 +41,10 @@ export default function CreateButton({ type, collectionId }: Props) {
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const setCollections = useSetAtom(collectionsAtom);
+  const setItems = useSetAtom(itemsAtom);
+  const placeHolder = `Enter ${
+    type === 'collection' ? 'Collection' : 'Item'
+  } name...`;
 
   if (!userId) return null;
 
@@ -60,13 +64,14 @@ export default function CreateButton({ type, collectionId }: Props) {
     })
       .then((newEntity) => {
         if (newEntity && isCollection) {
-          const newCollection = newEntity as CollectionWithTags;
-          setCollections((collections) => [...collections, newCollection]);
+          setCollections((collections) => [
+            ...collections,
+            newEntity as CollectionWithTags,
+          ]);
         } else {
-          // TODO: Fix item creation logic
+          setItems((items) => [...items, newEntity as ItemWithTags]);
         }
 
-        // router.refresh();
         closeDialog();
       })
       .catch((err) => console.error(err))
@@ -114,7 +119,7 @@ export default function CreateButton({ type, collectionId }: Props) {
                   id='name'
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder='Enter collection name...'
+                  placeholder={placeHolder}
                 />
               </div>
               <div className='mt-2'>

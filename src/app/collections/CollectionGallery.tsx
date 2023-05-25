@@ -3,9 +3,10 @@
 import GalleryNotFound from '@/components/collections/GalleryNotFound';
 import CollectionCard from './CollectionCard';
 import { useEffect, useState } from 'react';
-import { Input } from '@/components/shadcn-ui/input';
 import { collectionsAtom } from '@/lib/atoms';
 import { useAtomValue } from 'jotai';
+import { filterEntities } from '@/lib/formatters';
+import GalleryFilter from '@/components/collections/GalleryFilter';
 
 export default function CollectionGallery() {
   const collections = useAtomValue(collectionsAtom);
@@ -13,32 +14,12 @@ export default function CollectionGallery() {
   const [filteredCollections, setFilteredCollections] = useState(collections);
 
   useEffect(() => {
-    const filterCollections = () => {
-      if (!query || query === '') {
-        return collections;
-      } else {
-        return collections?.filter((collection) => {
-          return (
-            collection.name.toLowerCase().includes(query) ||
-            collection.tags.some((tag) =>
-              tag.name.toLowerCase().includes(query)
-            )
-          );
-        });
-      }
-    };
-
-    setFilteredCollections(filterCollections());
+    setFilteredCollections(filterEntities(query, collections));
   }, [query, collections]);
 
   return (
     <div className='flex w-full flex-col items-center'>
-      <Input
-        className='border-bottom text-md my-2 border-none text-center text-gray-400 focus:placeholder-transparent focus-visible:ring-0'
-        value={query}
-        placeholder='Filter collections...'
-        onChange={(e) => setQuery(e.target.value.toLowerCase())}
-      />
+      <GalleryFilter entity={'collections'} query={query} setQuery={setQuery} />
 
       {!filteredCollections || filteredCollections.length === 0 ? (
         <GalleryNotFound entity='collection' entityName='Collections' />
