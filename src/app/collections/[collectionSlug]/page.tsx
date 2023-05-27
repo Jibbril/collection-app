@@ -1,6 +1,7 @@
-import { currentUser } from '@clerk/nextjs';
+'use client';
+
+import { useAuth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
 import ItemGallery from './ItemGallery';
 import CreateButton from '@/components/collections/CreateButton';
 import {
@@ -9,58 +10,51 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/shadcn-ui/tooltip';
-
+import { type CollectionWithItemsAndTags } from '@/types/collections';
+import { useSWR } from '@/lib/hooks/swr';
+import Loader from '@/components/navigation/Loader';
+import ErrorPage from '@/components/error-page';
+import { itemsAtom } from '@/lib/atoms';
+import { useSetAtom } from 'jotai';
 interface Props {
   params: {
     collectionSlug: string;
   };
 }
 
-export default async function ItemsPage({ params }: Props) {
-  const user = await currentUser();
+export default function ItemsPage({ params }: Props) {
+  const { userId } = useAuth();
+  const { data, isLoading, error } = useSWR<CollectionWithItemsAndTags>(
+    `/api/items?collectionSlug=${params.collectionSlug}`
+  );
+  const setItems = useSetAtom(itemsAtom);
 
-  if (!user) return redirect('/login');
+  if (!userId) return redirect('/login');
 
-  const collection = await prisma.collection.findFirst({
-    where: {
-      userId: user.id,
-      slug: params.collectionSlug,
-    },
-    include: {
-      items: {
-        include: {
-          tags: {
-            orderBy: {
-              name: 'asc',
-            },
-          },
-        },
-      },
-    },
-  });
+  if (isLoading) return <Loader />;
+  if (error) return <ErrorPage message={error.message} />;
 
-  if (!collection) return redirect('/collections');
+  setItems(data?.items || []);
+
+  if (!data) return null;
 
   return (
     <div className='mt-1 flex w-full'>
       <div className='flex w-full flex-col items-center'>
         <div className='mb-2 mt-4 flex items-center'>
           <h4 className='font-heading text-3xl font-bold lg:text-4xl'>
-            {collection.name}
+            {data?.name}
           </h4>
         </div>
-        <ItemGallery
-          collectionSlug={collection.slug}
-          items={collection.items}
-        />
+        <ItemGallery collectionSlug={data.slug} />
       </div>
       <div className='mt-3'>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <CreateButton collectionId={collection.id} type='item' />
+              <CreateButton collectionId={data.id} type='item' />
             </TooltipTrigger>
-            <TooltipContent sideOffset='-0.5' side='bottom'>
+            <TooltipContent side='bottom'>
               <p>Create new Item</p>
             </TooltipContent>
           </Tooltip>

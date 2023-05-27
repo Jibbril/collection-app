@@ -12,22 +12,35 @@ import {
   DropdownMenuTrigger,
 } from '@/components/shadcn-ui/dropdown-menu';
 import { deleteCollection, deleteItem } from '@/server/actions';
-import { useRouter } from 'next/navigation';
 import { type Item, type Collection } from '@prisma/client';
+import { collectionsAtom, itemsAtom } from '@/lib/atoms';
+import { useSetAtom } from 'jotai';
 
 interface Props {
   type: 'collection' | 'item';
   entity: Collection | Item;
+  setLoading?: (loading: boolean) => void;
 }
 
-export default function EditButton({ type, entity }: Props) {
-  const router = useRouter();
+export default function EditButton({ type, entity, setLoading }: Props) {
+  const setCollections = useSetAtom(collectionsAtom);
+  const setItems = useSetAtom(itemsAtom);
+  const isCollection = type === 'collection';
+
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
-    const fn = type === 'collection' ? deleteCollection : deleteItem;
+    const fn = isCollection ? deleteCollection : deleteItem;
+    setLoading && setLoading(true);
     fn(entity.id)
-      .then(() => router.refresh())
-      .catch((err) => console.error(err));
+      .then(() => {
+        if (isCollection) {
+          setCollections((prev) => prev.filter((c) => c.id !== entity.id));
+        } else {
+          setItems((prev) => prev.filter((i) => i.id !== entity.id));
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading && setLoading(false));
   };
 
   return (

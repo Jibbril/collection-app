@@ -3,13 +3,17 @@
 import { generateSlug } from '@/lib/slug-handling';
 import { prisma } from '@/lib/prisma';
 import { type Tag } from '@prisma/client';
+import {
+  type CollectionWithTags,
+  type ItemWithTags,
+} from '@/types/collections';
 
 export const addCollection = async (config: {
   name: string;
   description: string;
   userId: string;
   tags: Tag[];
-}) => {
+}): Promise<CollectionWithTags> => {
   const collection = {
     name: config.name,
     description: config.description || '',
@@ -19,12 +23,66 @@ export const addCollection = async (config: {
 
   const connectTags = await ensureTagExistence(config.userId, config.tags);
 
-  await prisma.collection.create({
+  return await prisma.collection.create({
+    include: {
+      tags: true,
+    },
     data: {
       ...collection,
       tags: {
         connect: connectTags,
       },
+    },
+  });
+};
+
+export const addItem = async (config: {
+  name: string;
+  description: string;
+  userId: string;
+  collectionId: string;
+  tags: Tag[];
+}): Promise<ItemWithTags> => {
+  const item = {
+    name: config.name,
+    description: config.description || '',
+    slug: await generateSlug(config.name, config.userId),
+    collectionId: config.collectionId,
+  };
+
+  const connectTags = await ensureTagExistence(config.userId, config.tags);
+
+  return await prisma.item.create({
+    include: {
+      tags: true,
+    },
+    data: {
+      ...item,
+      tags: {
+        connect: connectTags,
+      },
+    },
+  });
+};
+
+export const deleteCollection = async (id: string) => {
+  await prisma.collection.delete({ where: { id } });
+};
+
+export const deleteItem = async (id: string) => {
+  await prisma.item.delete({ where: { id } });
+};
+
+export const searchTags = async (query: string, userId: string) => {
+  return await prisma.tag.findMany({
+    where: {
+      userId,
+      name: {
+        contains: query,
+      },
+    },
+    orderBy: {
+      name: 'asc',
     },
   });
 };
@@ -74,51 +132,3 @@ const ensureTagExistence = async (userId: string, tags: Tag[]) => {
   return existingTags.map((tag) => ({ id: tag.id }));
 };
 
-export const addItem = async (config: {
-  name: string;
-  description: string;
-  userId: string;
-  collectionId: string;
-  tags: Tag[];
-}) => {
-  const item = {
-    name: config.name,
-    description: config.description || '',
-    slug: await generateSlug(config.name, config.userId),
-    collectionId: config.collectionId,
-  };
-
-  await prisma.item.create({
-    data: {
-      ...item,
-      tags: {
-        create: config.tags.map((tag) => ({
-          name: tag.name,
-          userId: config.userId,
-        })),
-      },
-    },
-  });
-};
-
-export const deleteCollection = async (id: string) => {
-  await prisma.collection.delete({ where: { id } });
-};
-
-export const deleteItem = async (id: string) => {
-  await prisma.item.delete({ where: { id } });
-};
-
-export const searchTags = async (query: string, userId: string) => {
-  return await prisma.tag.findMany({
-    where: {
-      userId,
-      name: {
-        contains: query,
-      },
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  });
-};
