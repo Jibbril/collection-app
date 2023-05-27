@@ -19,6 +19,8 @@ import { collectionsAtom, itemsAtom } from '@/lib/atoms';
 import { useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useSetAtom } from 'jotai';
+import { validateURL } from '@/lib/formatters';
+import { produce } from 'immer';
 import TagInput from './TagInput';
 import TagGrid from './TagGrid';
 import { type MouseEvent } from 'react';
@@ -33,33 +35,50 @@ interface Props {
   collectionId?: string;
 }
 
+interface FormState {
+  name: string;
+  description: string;
+  link: string;
+}
+
+const formDefaults = {
+  name: '',
+  description: '',
+  link: '',
+};
+
 export default function CreateButton({ type, collectionId }: Props) {
   const { userId } = useAuth();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [tags, setTags] = useState<Tag[]>([]);
   const setCollections = useSetAtom(collectionsAtom);
   const setItems = useSetAtom(itemsAtom);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [linkValid, setLinkValid] = useState(true);
+
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [formState, setFormState] = useState<FormState>(formDefaults);
+  const { name, description, link } = formState;
+
   const placeHolder = `Enter ${
     type === 'collection' ? 'Collection' : 'Item'
   } name...`;
+  const isCollection = type === 'collection';
+  const entity = isCollection ? 'Collection' : 'Item';
 
   if (!userId) return null;
 
-  const entity = type === 'collection' ? 'Collection' : 'Item';
   const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    const isCollection = type === 'collection';
     new Promise<CollectionWithTags | ItemWithTags>((resolve) => {
       if (isCollection) {
         resolve(addCollection({ name, description, userId, tags }));
       } else {
         if (!collectionId) throw new Error('No collection ID provided');
-        resolve(addItem({ name, description, collectionId, userId, tags }));
+        resolve(
+          addItem({ name, description, link, collectionId, userId, tags })
+        );
       }
     })
       .then((newEntity) => {
@@ -79,9 +98,9 @@ export default function CreateButton({ type, collectionId }: Props) {
   };
 
   const closeDialog = () => {
+    setFormState(formDefaults);
     setOpen(false);
-    setName('');
-    setDescription('');
+    setLinkValid(true);
     setTags([]);
   };
 
@@ -118,7 +137,13 @@ export default function CreateButton({ type, collectionId }: Props) {
                   type='text'
                   id='name'
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setFormState(
+                      produce(formState, (draft) => {
+                        draft.name = e.target.value;
+                      })
+                    );
+                  }}
                   placeholder={placeHolder}
                 />
               </div>
@@ -127,10 +152,41 @@ export default function CreateButton({ type, collectionId }: Props) {
                 <Textarea
                   id='description'
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => {
+                    setFormState(
+                      produce(formState, (draft) => {
+                        draft.description = e.target.value;
+                      })
+                    );
+                  }}
                   placeholder='Enter description...'
                 />
               </div>
+              {!isCollection && (
+                <div className='mt-2'>
+                  <Label htmlFor='link'>Link</Label>
+                  <Input
+                    type='url'
+                    id='link'
+                    className={linkValid ? '' : 'border-red-600'}
+                    value={link}
+                    onChange={(e) => {
+                      setFormState(
+                        produce(formState, (draft) => {
+                          draft.link = e.target.value;
+                        })
+                      );
+                    }}
+                    onBlur={() =>
+                      setLinkValid(link === '' || validateURL(link))
+                    }
+                    placeholder='Enter link...'
+                  />
+                  {!linkValid && (
+                    <p className='text-sm text-red-600'>Invalid URL</p>
+                  )}
+                </div>
+              )}
               <div className='mt-2'>
                 <Label htmlFor='tags'>Tags</Label>
                 <TagInput userId={userId} tags={tags} setTags={setTags} />

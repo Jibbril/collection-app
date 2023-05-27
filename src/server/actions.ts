@@ -41,6 +41,7 @@ export const addItem = async (config: {
   description: string;
   userId: string;
   collectionId: string;
+  link: string;
   tags: Tag[];
 }): Promise<ItemWithTags> => {
   const item = {
@@ -48,6 +49,7 @@ export const addItem = async (config: {
     description: config.description || '',
     slug: await generateSlug(config.name, config.userId),
     collectionId: config.collectionId,
+    link: config.link,
   };
 
   const connectTags = await ensureTagExistence(config.userId, config.tags);
@@ -131,4 +133,3 @@ const ensureTagExistence = async (userId: string, tags: Tag[]) => {
   // Return all tags
   return existingTags.map((tag) => ({ id: tag.id }));
 };
-
