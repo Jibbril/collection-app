@@ -5,7 +5,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/shadcn-ui/dialog';
 import EntityForm from './EntityForm';
 import { useState, type ReactNode } from 'react';
@@ -13,6 +12,7 @@ import { useAuth } from '@clerk/nextjs';
 
 interface Props {
   children: ReactNode;
+  editing: boolean;
   type: Entity;
   collectionId?: string;
   open: boolean;
@@ -24,6 +24,7 @@ export default function EntityDialog({
   children,
   open,
   setOpen,
+  editing,
   type,
   formDefaults,
   collectionId,
@@ -42,8 +43,9 @@ export default function EntityDialog({
 
   return (
     <Dialog open={open}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      {children}
       <DialogContent
+        onClick={(e) => e.stopPropagation()}
         onCloseClick={() => closeDialog()}
         onInteractOutside={(e) => {
           if (loading) e.preventDefault();
@@ -54,10 +56,15 @@ export default function EntityDialog({
           else closeDialog();
         }}>
         <DialogHeader>
-          <DialogTitle>New {entity}</DialogTitle>
-          <DialogDescription>Create new {entity}</DialogDescription>
+          <DialogTitle>
+            {editing ? 'Edit' : 'New'} {entity}
+          </DialogTitle>
+          {!editing && (
+            <DialogDescription>Create new {entity}</DialogDescription>
+          )}
         </DialogHeader>
         <EntityForm
+          editing={editing}
           type={type}
           formDefaults={formDefaults}
           userId={userId}

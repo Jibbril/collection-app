@@ -26,6 +26,7 @@ interface Props {
   userId: string;
   collectionId?: string;
   loading: boolean;
+  editing: boolean;
   setLoading: (loading: boolean) => void;
   setOpen: (open: boolean) => void;
 }
@@ -36,6 +37,7 @@ export default function EntityForm({
   userId,
   collectionId,
   loading,
+  editing,
   setLoading,
   setOpen,
 }: Props) {
@@ -69,7 +71,14 @@ export default function EntityForm({
       } else {
         if (!collectionId) throw new Error('No collection ID provided');
         resolve(
-          addItem({ name, description, link, collectionId, userId, tags })
+          addItem({
+            name,
+            description,
+            link: link || '',
+            collectionId,
+            userId,
+            tags,
+          })
         );
       }
     })
@@ -140,7 +149,7 @@ export default function EntityForm({
             onBlur={() => {
               setFormState(
                 produce(formState, (draft) => {
-                  draft.linkValid = link === '' || validateURL(link);
+                  draft.linkValid = link === '' || validateURL(link || '');
                 })
               );
             }}
@@ -171,7 +180,7 @@ export default function EntityForm({
               Loading...
             </div>
           ) : (
-            <span>Create</span>
+            <span>{editing ? 'Update' : 'Create'}</span>
           )}
         </Button>
       </DialogFooter>

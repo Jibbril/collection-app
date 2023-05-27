@@ -25,6 +25,7 @@ export default function CreateButton({ type, collectionId }: Props) {
   return (
     <div className='ml-2 pt-1'>
       <EntityDialog
+        editing={false}
         open={open}
         setOpen={setOpen}
         type={type}

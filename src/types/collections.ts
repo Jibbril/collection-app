@@ -17,9 +17,10 @@ export type ItemWithTags = Prisma.ItemGetPayload<{ include: { tags: true } }>;
 export interface FormState {
   name: string;
   description: string;
-  link: string;
-  linkValid: boolean;
+  link?: string;
+  linkValid?: boolean;
   tags: Tag[];
 }
 
 export type Entity = 'collection' | 'item';
+export type EntityWithTags = CollectionWithTags | ItemWithTags;
