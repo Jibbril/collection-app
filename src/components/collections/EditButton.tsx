@@ -47,9 +47,7 @@ export default function EditButton({ type, entity, setLoading }: Props) {
     <div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            className='absolute right-2 top-2 h-6 w-6 rounded-full p-0 '>
+          <Button variant='ghost' className='h-8 w-8 rounded-full p-0 '>
             <MoreVertical className='h-4 w-4' />
             <span className='sr-only'>Edit {type}</span>
           </Button>
