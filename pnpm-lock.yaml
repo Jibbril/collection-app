@@ -43,6 +43,9 @@ dependencies:
   dotenv:
     specifier: ^16.0.3
     version: 16.0.3
+  immer:
+    specifier: ^10.0.2
+    version: 10.0.2
   jotai:
     specifier: ^2.1.0
     version: 2.1.0(react@18.2.0)
@@ -67,6 +70,9 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.5
     version: 1.0.5(tailwindcss@3.3.2)
+  use-immer:
+    specifier: ^0.9.0
+    version: 0.9.0(immer@10.0.2)(react@18.2.0)
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
@@ -2529,6 +2535,10 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
+  /immer@10.0.2:
+    resolution: {integrity: sha512-Rx3CqeqQ19sxUtYV9CU911Vhy8/721wRFnJv3REVGWUmoAcIwzifTsdmJte/MV+0/XpM35LZdQMBGkRIoLPwQA==}
+    dev: false
+
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -3916,6 +3926,16 @@ packages:
       '@types/react': 18.2.5
       react: 18.2.0
       tslib: 2.5.0
+    dev: false
+
+  /use-immer@0.9.0(immer@10.0.2)(react@18.2.0):
+    resolution: {integrity: sha512-/L+enLi0nvuZ6j4WlyK0US9/ECUtV5v9RUbtxnn5+WbtaXYUaOBoKHDNL9I5AETdurQ4rIFIj/s+Z5X80ATyKw==}
+    peerDependencies:
+      immer: '>=2.0.0'
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0
+    dependencies:
+      immer: 10.0.2
+      react: 18.2.0
     dev: false
 
   /use-isomorphic-layout-effect@1.1.2(@types/react@18.2.5)(react@18.2.0):
