@@ -21,3 +21,5 @@ export interface FormState {
   linkValid: boolean;
   tags: Tag[];
 }
+
+export type Entity = 'collection' | 'item';

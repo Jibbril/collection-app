@@ -2,6 +2,7 @@ import {
   type CollectionWithTags,
   type ItemWithTags,
   type FormState,
+  type Entity,
 } from '@/types/collections';
 import { type Tag } from '@prisma/client';
 import { Label } from '@/components/shadcn-ui/label';
@@ -20,7 +21,7 @@ import TagInput from './TagInput';
 import TagGrid from './TagGrid';
 
 interface Props {
-  type: 'collection' | 'item';
+  type: Entity;
   formDefaults: FormState;
   userId: string;
   collectionId?: string;
