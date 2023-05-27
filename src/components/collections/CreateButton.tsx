@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useSetAtom } from 'jotai';
 import { validateURL } from '@/lib/formatters';
+import { produce } from 'immer';
 import TagInput from './TagInput';
 import TagGrid from './TagGrid';
 import { type MouseEvent } from 'react';
@@ -34,19 +35,29 @@ interface Props {
   collectionId?: string;
 }
 
+interface FormState {
+  name: string;
+  description: string;
+  link: string;
+}
+
+const formDefaults = {
+  name: '',
+  description: '',
+  link: '',
+};
+
 export default function CreateButton({ type, collectionId }: Props) {
   const { userId } = useAuth();
   const setCollections = useSetAtom(collectionsAtom);
   const setItems = useSetAtom(itemsAtom);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
-  // Form state
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [link, setLink] = useState('');
   const [linkValid, setLinkValid] = useState(true);
+
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [formState, setFormState] = useState<FormState>(formDefaults);
+  const { name, description, link } = formState;
 
   const placeHolder = `Enter ${
     type === 'collection' ? 'Collection' : 'Item'
@@ -87,9 +98,9 @@ export default function CreateButton({ type, collectionId }: Props) {
   };
 
   const closeDialog = () => {
+    setFormState(formDefaults);
     setOpen(false);
-    setName('');
-    setDescription('');
+    setLinkValid(true);
     setTags([]);
   };
 
@@ -126,7 +137,13 @@ export default function CreateButton({ type, collectionId }: Props) {
                   type='text'
                   id='name'
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setFormState(
+                      produce(formState, (draft) => {
+                        draft.name = e.target.value;
+                      })
+                    );
+                  }}
                   placeholder={placeHolder}
                 />
               </div>
@@ -135,7 +152,13 @@ export default function CreateButton({ type, collectionId }: Props) {
                 <Textarea
                   id='description'
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => {
+                    setFormState(
+                      produce(formState, (draft) => {
+                        draft.description = e.target.value;
+                      })
+                    );
+                  }}
                   placeholder='Enter description...'
                 />
               </div>
@@ -147,7 +170,13 @@ export default function CreateButton({ type, collectionId }: Props) {
                     id='link'
                     className={linkValid ? '' : 'border-red-600'}
                     value={link}
-                    onChange={(e) => setLink(e.target.value)}
+                    onChange={(e) => {
+                      setFormState(
+                        produce(formState, (draft) => {
+                          draft.link = e.target.value;
+                        })
+                      );
+                    }}
                     onBlur={() =>
                       setLinkValid(link === '' || validateURL(link))
                     }

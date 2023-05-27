@@ -70,9 +70,6 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.5
     version: 1.0.5(tailwindcss@3.3.2)
-  use-immer:
-    specifier: ^0.9.0
-    version: 0.9.0(immer@10.0.2)(react@18.2.0)
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
@@ -3926,16 +3923,6 @@ packages:
       '@types/react': 18.2.5
       react: 18.2.0
       tslib: 2.5.0
-    dev: false
-
-  /use-immer@0.9.0(immer@10.0.2)(react@18.2.0):
-    resolution: {integrity: sha512-/L+enLi0nvuZ6j4WlyK0US9/ECUtV5v9RUbtxnn5+WbtaXYUaOBoKHDNL9I5AETdurQ4rIFIj/s+Z5X80ATyKw==}
-    peerDependencies:
-      immer: '>=2.0.0'
-      react: ^16.8.0 || ^17.0.1 || ^18.0.0
-    dependencies:
-      immer: 10.0.2
-      react: 18.2.0
     dev: false
 
   /use-isomorphic-layout-effect@1.1.2(@types/react@18.2.5)(react@18.2.0):
