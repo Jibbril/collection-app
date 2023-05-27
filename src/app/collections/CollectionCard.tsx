@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from '@/components/shadcn-ui/card';
 import Link from 'next/link';
-import CardEditButton from '@/components/collections/EditButton';
+import CardOptionsButton from '@/components/collections/CardOptionsButton';
 import TagGrid from '@/components/collections/TagGrid';
 import { type CollectionWithTags } from '@/types/collections';
 import { shortenIfNeeded } from '@/lib/utils';
@@ -39,7 +39,7 @@ export default function CollectionCard({ collection }: Props) {
         <CardHeader>
           <div className='flex items-center justify-between'>
             <CardTitle className='py-1'>{collection.name}</CardTitle>
-            <CardEditButton
+            <CardOptionsButton
               entity={collection}
               type='collection'
               setLoading={setLoading}

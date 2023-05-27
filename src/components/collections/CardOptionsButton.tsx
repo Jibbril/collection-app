@@ -1,33 +1,32 @@
 'use client';
 
+import { type Item, type Collection } from '@prisma/client';
 import { type MouseEvent } from 'react';
+import { type Entity } from '@/types/collections';
 import { Edit, MoreVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/shadcn-ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/shadcn-ui/dropdown-menu';
 import { deleteCollection, deleteItem } from '@/server/actions';
-import { type Item, type Collection } from '@prisma/client';
 import { collectionsAtom, itemsAtom } from '@/lib/atoms';
 import { useSetAtom } from 'jotai';
 
 interface Props {
-  type: 'collection' | 'item';
+  type: Entity;
   entity: Collection | Item;
   setLoading?: (loading: boolean) => void;
 }
 
-export default function EditButton({ type, entity, setLoading }: Props) {
+export default function CardOptions({ type, entity, setLoading }: Props) {
   const setCollections = useSetAtom(collectionsAtom);
   const setItems = useSetAtom(itemsAtom);
   const isCollection = type === 'collection';
 
-  const handleEdit = (e: MouseEvent) => {
+  const handleDelete = (e: MouseEvent) => {
     e.stopPropagation();
     const fn = isCollection ? deleteCollection : deleteItem;
     setLoading && setLoading(true);
@@ -43,6 +42,10 @@ export default function EditButton({ type, entity, setLoading }: Props) {
       .finally(() => setLoading && setLoading(false));
   };
 
+  const handleEdit = (e: MouseEvent) => {
+    // ja
+  };
+
   return (
     <div>
       <DropdownMenu>
@@ -53,13 +56,11 @@ export default function EditButton({ type, entity, setLoading }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>Options</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEdit}>
             <Edit className='mr-2 h-4 w-4' />
             <span>Edit</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleEdit}>
+          <DropdownMenuItem onClick={handleDelete}>
             <Trash2 className='mr-2 h-4 w-4' />
             <span>Delete</span>
           </DropdownMenuItem>
