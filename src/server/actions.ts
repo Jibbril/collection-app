@@ -55,19 +55,48 @@ export const updateCollection = async (
 
   const connectTags = await ensureTagExistence(config.userId, config.tags);
 
-  return await prisma.collection.update({
-    where: {
-      id: config.id,
-    },
-    include: {
-      tags: true,
-    },
-    data: {
-      ...collection,
-      tags: {
-        connect: connectTags,
+  return await prisma.$transaction(async (tx) => {
+    // Disconnect all tags from existing collection in case they were removed
+    const existingCollection = await tx.collection.findFirst({
+      where: {
+        id: config.id,
       },
-    },
+      include: {
+        tags: true,
+      },
+    });
+
+    if (existingCollection) {
+      await tx.collection.update({
+        where: {
+          id: config.id,
+        },
+        data: {
+          tags: {
+            disconnect: [
+              ...existingCollection.tags.map((tag) => ({
+                id: tag.id,
+              })),
+            ],
+          },
+        },
+      });
+    }
+
+    return await tx.collection.update({
+      where: {
+        id: config.id,
+      },
+      include: {
+        tags: true,
+      },
+      data: {
+        ...collection,
+        tags: {
+          connect: connectTags,
+        },
+      },
+    });
   });
 };
 
@@ -117,20 +146,52 @@ export const updateItem = async (
 
   const connectTags = await ensureTagExistence(config.userId, config.tags);
 
-  return await prisma.item.update({
-    where: {
-      id: config.id,
+  return await prisma.$transaction(
+    async (tx) => {
+      // Disconnect all tags from existing item in case they were remove
+      const existingItem = await tx.item.findFirst({
+        where: {
+          id: config.id,
+        },
+        include: {
+          tags: true,
+        },
+      });
+
+      if (existingItem) {
+        await tx.item.update({
+          where: {
+            id: config.id,
+          },
+          data: {
+            tags: {
+              disconnect: [
+                ...existingItem.tags.map((tag) => ({
+                  id: tag.id,
+                })),
+              ],
+            },
+          },
+        });
+      }
+
+      return await tx.item.update({
+        where: {
+          id: config.id,
+        },
+        include: {
+          tags: true,
+        },
+        data: {
+          ...item,
+          tags: {
+            connect: connectTags,
+          },
+        },
+      });
     },
-    include: {
-      tags: true,
-    },
-    data: {
-      ...item,
-      tags: {
-        connect: connectTags,
-      },
-    },
-  });
+    { maxWait: 10000 }
+  );
 };
 
 export const deleteCollection = async (id: string) => {
