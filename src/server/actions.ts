@@ -8,12 +8,16 @@ import {
   type ItemWithTags,
 } from '@/types/collections';
 
-export const addCollection = async (config: {
+interface CollectionPayload {
+  userId: string;
   name: string;
   description: string;
-  userId: string;
   tags: Tag[];
-}): Promise<CollectionWithTags> => {
+}
+
+export const addCollection = async (
+  config: CollectionPayload
+): Promise<CollectionWithTags> => {
   const collection = {
     name: config.name,
     description: config.description || '',
@@ -36,14 +40,43 @@ export const addCollection = async (config: {
   });
 };
 
-export const addItem = async (config: {
-  name: string;
-  description: string;
-  userId: string;
+interface CollectionUpdatePayload extends CollectionPayload {
+  id: string;
+}
+
+export const updateCollection = async (
+  config: CollectionUpdatePayload
+): Promise<CollectionWithTags> => {
+  const collection = {
+    name: config.name,
+    description: config.description || '',
+    slug: await generateSlug(config.name, config.userId),
+  };
+
+  const connectTags = await ensureTagExistence(config.userId, config.tags);
+
+  return await prisma.collection.update({
+    where: {
+      id: config.id,
+    },
+    include: {
+      tags: true,
+    },
+    data: {
+      ...collection,
+      tags: {
+        connect: connectTags,
+      },
+    },
+  });
+};
+
+interface ItemPayload extends CollectionPayload {
   collectionId: string;
   link: string;
-  tags: Tag[];
-}): Promise<ItemWithTags> => {
+}
+
+export const addItem = async (config: ItemPayload): Promise<ItemWithTags> => {
   const item = {
     name: config.name,
     description: config.description || '',
@@ -55,6 +88,39 @@ export const addItem = async (config: {
   const connectTags = await ensureTagExistence(config.userId, config.tags);
 
   return await prisma.item.create({
+    include: {
+      tags: true,
+    },
+    data: {
+      ...item,
+      tags: {
+        connect: connectTags,
+      },
+    },
+  });
+};
+
+interface ItemUpdatePayload extends ItemPayload {
+  id: string;
+}
+
+export const updateItem = async (
+  config: ItemUpdatePayload
+): Promise<ItemWithTags> => {
+  const item = {
+    name: config.name,
+    description: config.description || '',
+    slug: await generateSlug(config.name, config.userId),
+    collectionId: config.collectionId,
+    link: config.link,
+  };
+
+  const connectTags = await ensureTagExistence(config.userId, config.tags);
+
+  return await prisma.item.update({
+    where: {
+      id: config.id,
+    },
     include: {
       tags: true,
     },

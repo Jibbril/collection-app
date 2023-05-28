@@ -70,6 +70,7 @@ export default function CardOptions({ type, entity, setLoading }: Props) {
   return (
     <div>
       <EntityDialog
+        entityId={entity.id}
         editing={true}
         open={open}
         setOpen={setOpen}

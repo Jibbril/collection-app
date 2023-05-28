@@ -13,7 +13,12 @@ import { validateURL } from '@/lib/formatters';
 import { DialogFooter } from '../shadcn-ui/dialog';
 import { Button } from '../shadcn-ui/button';
 import { useState, type MouseEvent } from 'react';
-import { addCollection, addItem } from '@/server/actions';
+import {
+  addCollection,
+  addItem,
+  updateCollection,
+  updateItem,
+} from '@/server/actions';
 import { useSetAtom } from 'jotai';
 import { collectionsAtom, itemsAtom } from '@/lib/atoms';
 import { Loader2 } from 'lucide-react';
@@ -25,6 +30,7 @@ interface Props {
   formDefaults: FormState;
   userId: string;
   collectionId?: string;
+  entityId?: string;
   loading: boolean;
   editing: boolean;
   setLoading: (loading: boolean) => void;
@@ -35,6 +41,7 @@ export default function EntityForm({
   type,
   formDefaults,
   userId,
+  entityId,
   collectionId,
   loading,
   editing,
@@ -59,6 +66,55 @@ export default function EntityForm({
         draft.tags = tags;
       })
     );
+  };
+
+  const handleUpdate = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    new Promise<CollectionWithTags | ItemWithTags>((resolve) => {
+      if (isCollection) {
+        resolve(
+          updateCollection({
+            id: entityId as string,
+            name,
+            description,
+            userId,
+            tags,
+          })
+        );
+      } else {
+        if (!collectionId) throw new Error('No collection ID provided');
+        resolve(
+          updateItem({
+            id: entityId as string,
+            name,
+            description,
+            link: link || '',
+            collectionId,
+            userId,
+            tags,
+          })
+        );
+      }
+    })
+      .then((newEntity) => {
+        if (newEntity && isCollection) {
+          setCollections((collections) => [
+            ...collections.filter((c) => c.id !== entityId),
+            newEntity as CollectionWithTags,
+          ]);
+        } else {
+          setItems((items) => [
+            ...items.filter((i) => i.id !== entityId),
+            newEntity as ItemWithTags,
+          ]);
+        }
+
+        setOpen(false);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   };
 
   const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {
@@ -171,7 +227,13 @@ export default function EntityForm({
       <DialogFooter>
         <Button
           disabled={Boolean(!name || name === '' || loading)}
-          onClick={handleAdd}
+          onClick={(e) => {
+            if (editing) {
+              handleUpdate(e);
+            } else {
+              handleAdd(e);
+            }
+          }}
           className='mr-1 mt-4'
           type='submit'>
           {loading ? (

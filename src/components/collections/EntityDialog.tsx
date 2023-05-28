@@ -14,6 +14,7 @@ interface Props {
   children: ReactNode;
   editing: boolean;
   type: Entity;
+  entityId?: string;
   collectionId?: string;
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -25,6 +26,7 @@ export default function EntityDialog({
   open,
   setOpen,
   editing,
+  entityId,
   type,
   formDefaults,
   collectionId,
@@ -64,6 +66,7 @@ export default function EntityDialog({
           )}
         </DialogHeader>
         <EntityForm
+          entityId={entityId}
           editing={editing}
           type={type}
           formDefaults={formDefaults}
