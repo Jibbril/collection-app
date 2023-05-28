@@ -8,12 +8,16 @@ import {
   type ItemWithTags,
 } from '@/types/collections';
 
-export const addCollection = async (config: {
+interface CollectionPayload {
+  userId: string;
   name: string;
   description: string;
-  userId: string;
   tags: Tag[];
-}): Promise<CollectionWithTags> => {
+}
+
+export const addCollection = async (
+  config: CollectionPayload
+): Promise<CollectionWithTags> => {
   const collection = {
     name: config.name,
     description: config.description || '',
@@ -36,14 +40,72 @@ export const addCollection = async (config: {
   });
 };
 
-export const addItem = async (config: {
-  name: string;
-  description: string;
-  userId: string;
+interface CollectionUpdatePayload extends CollectionPayload {
+  id: string;
+}
+
+export const updateCollection = async (
+  config: CollectionUpdatePayload
+): Promise<CollectionWithTags> => {
+  const collection = {
+    name: config.name,
+    description: config.description || '',
+    slug: await generateSlug(config.name, config.userId),
+  };
+
+  const connectTags = await ensureTagExistence(config.userId, config.tags);
+
+  return await prisma.$transaction(async (tx) => {
+    // Disconnect all tags from existing collection in case they were removed
+    const existingCollection = await tx.collection.findFirst({
+      where: {
+        id: config.id,
+      },
+      include: {
+        tags: true,
+      },
+    });
+
+    if (existingCollection) {
+      await tx.collection.update({
+        where: {
+          id: config.id,
+        },
+        data: {
+          tags: {
+            disconnect: [
+              ...existingCollection.tags.map((tag) => ({
+                id: tag.id,
+              })),
+            ],
+          },
+        },
+      });
+    }
+
+    return await tx.collection.update({
+      where: {
+        id: config.id,
+      },
+      include: {
+        tags: true,
+      },
+      data: {
+        ...collection,
+        tags: {
+          connect: connectTags,
+        },
+      },
+    });
+  });
+};
+
+interface ItemPayload extends CollectionPayload {
   collectionId: string;
   link: string;
-  tags: Tag[];
-}): Promise<ItemWithTags> => {
+}
+
+export const addItem = async (config: ItemPayload): Promise<ItemWithTags> => {
   const item = {
     name: config.name,
     description: config.description || '',
@@ -65,6 +127,71 @@ export const addItem = async (config: {
       },
     },
   });
+};
+
+interface ItemUpdatePayload extends ItemPayload {
+  id: string;
+}
+
+export const updateItem = async (
+  config: ItemUpdatePayload
+): Promise<ItemWithTags> => {
+  const item = {
+    name: config.name,
+    description: config.description || '',
+    slug: await generateSlug(config.name, config.userId),
+    collectionId: config.collectionId,
+    link: config.link,
+  };
+
+  const connectTags = await ensureTagExistence(config.userId, config.tags);
+
+  return await prisma.$transaction(
+    async (tx) => {
+      // Disconnect all tags from existing item in case they were remove
+      const existingItem = await tx.item.findFirst({
+        where: {
+          id: config.id,
+        },
+        include: {
+          tags: true,
+        },
+      });
+
+      if (existingItem) {
+        await tx.item.update({
+          where: {
+            id: config.id,
+          },
+          data: {
+            tags: {
+              disconnect: [
+                ...existingItem.tags.map((tag) => ({
+                  id: tag.id,
+                })),
+              ],
+            },
+          },
+        });
+      }
+
+      return await tx.item.update({
+        where: {
+          id: config.id,
+        },
+        include: {
+          tags: true,
+        },
+        data: {
+          ...item,
+          tags: {
+            connect: connectTags,
+          },
+        },
+      });
+    },
+    { maxWait: 10000 }
+  );
 };
 
 export const deleteCollection = async (id: string) => {

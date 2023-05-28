@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from '@/components/shadcn-ui/card';
 import Link from 'next/link';
-import CardEditButton from '@/components/collections/EditButton';
+import CardOptionsButton from '@/components/collections/CardOptionsButton';
 import TagGrid from '@/components/collections/TagGrid';
 import { shortenIfNeeded } from '@/lib/utils';
 import { useState } from 'react';
@@ -56,7 +56,7 @@ export default function ItemCard({ item, collectionSlug }: Props) {
                   </Button>
                 </a>
               )}
-              <CardEditButton
+              <CardOptionsButton
                 entity={item}
                 type='item'
                 setLoading={setLoading}
